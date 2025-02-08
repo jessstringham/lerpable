@@ -1,0 +1,3 @@
+[workspace]
+members = ["lerpable", "lerpable_derive"]
+resolver = "2"
