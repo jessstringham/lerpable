@@ -1,0 +1,2 @@
+# lerpable
+Linearly interpolate ADTs
