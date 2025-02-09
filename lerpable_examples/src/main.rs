@@ -60,8 +60,21 @@ enum EnumTest {
     B(BasicTypesWithOverrides),
 }
 
-#[derive(Debug, Clone, Lerpable)]
+#[derive(Debug, Clone)]
 struct SimpleNewtype(f32);
+impl Lerpable for SimpleNewtype {
+    fn lerpify<T: IsLerpingMethod>(&self, other: &Self, pct: &T) -> Self {
+        if pct.lerp_pct() > 0.25 {
+            self.clone()
+        } else {
+            other.clone()
+        }
+    }
+
+    fn lerp_partial<T: IsLerpingMethod>(&self, pct: T) -> Self {
+        SimpleNewtype(pct.lerp_pct() as f32)
+    }
+}
 
 #[derive(Debug, Clone, Lerpable)]
 struct OverrideNewtype(#[lerpable(func = "custom_func")] f32);

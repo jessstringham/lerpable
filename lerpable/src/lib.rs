@@ -80,8 +80,7 @@ impl IsLerpingMethod for f64 {
     }
 
     fn partial_lerp_pct(&self, i: usize, total: usize) -> f64 {
-        // (self - i / total) * total
-        // or (self * total).fract()
+        // should be the same as (self - i / total) * total but multiplied out
         *self * total as f64 - i as f64
     }
 
