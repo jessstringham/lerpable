@@ -13,12 +13,10 @@ where
     Self: Sized,
 {
     fn from_newtype_struct(_idents: StructIdents, parent_ident: syn::Ident) -> Self;
-    fn from_newtype_recurse_struct_vec(_idents: StructIdents) -> Self;
     fn from_unnamed_enum(idents: EnumIdents) -> Self;
     fn from_unit_enum(idents: EnumIdents) -> Self;
     fn from_noop_struct(idents: StructIdents) -> Self;
     fn from_type_struct(idents: StructIdents) -> Self;
-    fn from_recurse_struct_vec(idents: StructIdents) -> Self;
 
     fn from_ast(ast_receiver: LivecodeReceiver) -> TokenStream2 {
         match ast_receiver.data {
@@ -63,12 +61,6 @@ where
                         #[cfg(feature = "debug_logging")]
                         log::info!("-> from_type_struct");
                         Self::from_type_struct(idents)
-                    }
-                    // creating a Vec<Something>
-                    HowToControlThis::Vec => {
-                        #[cfg(feature = "debug_logging")]
-                        log::info!("-> from_recurse_struct_vec");
-                        Self::from_recurse_struct_vec(idents)
                     }
                 }
             })
@@ -131,12 +123,6 @@ where
                         log::info!("-> from_newtype_struct");
                         Self::from_newtype_struct(idents, name.clone())
                     }
-                    // creating a Vec<Something>
-                    HowToControlThis::Vec => {
-                        #[cfg(feature = "debug_logging")]
-                        log::info!("-> from_newtype_recurse_struct_vec");
-                        Self::from_newtype_recurse_struct_vec(idents)
-                    }
                     HowToControlThis::Skip => {
                         #[cfg(feature = "debug_logging")]
                         log::info!("-> from_newtype_recurse_struct_vec");
@@ -156,7 +142,6 @@ where
 #[darling(attributes(lerpable))]
 pub(crate) struct LivecodeFieldReceiver {
     pub(crate) ident: Option<syn::Ident>,
-    pub(crate) ty: syn::Type,
     pub(crate) method: Option<String>, // from this point on, start using String instead of the function we started with
 }
 impl LivecodeFieldReceiver {
@@ -168,8 +153,7 @@ impl LivecodeFieldReceiver {
         if self.is_skip() {
             HowToControlThis::Skip
         } else {
-            let type_idents = ident_from_type(&self.ty);
-            HowToControlThis::from_type_str(type_idents.to_string().as_ref())
+            HowToControlThis::LerpifyType
         }
     }
 }
@@ -239,47 +223,5 @@ impl StructIdents {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) enum HowToControlThis {
     Skip,        // return the old object
-    Vec,         // combine_vec
-    LerpifyType, // structs, enums, f32, bool, etc, just going to call their lerpify functions
-}
-impl HowToControlThis {
-    pub(crate) fn from_type_str(value: &str) -> HowToControlThis {
-        match value {
-            "Vec" => HowToControlThis::Vec,
-            "String" => HowToControlThis::Skip,
-            _ => HowToControlThis::LerpifyType,
-        }
-    }
-}
-
-pub fn recursive_ident_from_path(t: &syn::Type, acc: &mut Vec<syn::Ident>) {
-    match t {
-        syn::Type::Path(syn::TypePath { path, .. }) => {
-            let s = path.segments.last().unwrap();
-            let main_type = s.ident.clone();
-
-            acc.push(main_type);
-
-            if let syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments {
-                args,
-                ..
-            }) = s.arguments.clone()
-            {
-                if let syn::GenericArgument::Type(other_ty) = args.first().unwrap() {
-                    recursive_ident_from_path(other_ty, acc);
-                } else {
-                    panic!("recursive ident not implemented yet {:?}", args);
-                }
-            }
-        }
-        x => panic!("no name for type {:?}", x),
-    }
-}
-
-pub(crate) fn ident_from_type(t: &syn::Type) -> syn::Ident {
-    let mut acc = vec![];
-    recursive_ident_from_path(t, &mut acc);
-
-    // will always have at least one item
-    acc[0].clone()
+    LerpifyType, // apply its lerpify
 }

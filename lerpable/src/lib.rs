@@ -100,7 +100,6 @@ pub trait Lerpable: Sized + Clone {
     }
 }
 
-
 macro_rules! impl_lerpable {
     ($t:ty) => {
         impl Lerpable for $t {
@@ -111,7 +110,6 @@ macro_rules! impl_lerpable {
     };
 }
 
-
 impl_lerpable!(usize);
 impl_lerpable!(u8);
 impl_lerpable!(u16);
@@ -120,3 +118,12 @@ impl_lerpable!(i32);
 impl_lerpable!(i64);
 impl_lerpable!(f32);
 impl_lerpable!(f64);
+
+impl<T: Lerpable + Clone> Lerpable for Vec<T> {
+    fn lerpify<LerpMethod: IsLerpingMethod>(&self, other: &Self, method: &LerpMethod) -> Self {
+        if self.len() == 0 || other.len() == 0 {
+            return self.clone();
+        }
+        combine_vecs(&self, &other, method)
+    }
+}

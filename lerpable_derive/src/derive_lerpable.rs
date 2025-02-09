@@ -135,33 +135,4 @@ impl GenFinal for FieldTokensLerpable {
 
         FieldTokensLerpable { for_lerpable }
     }
-
-    // v: Vec<f32>
-    fn from_recurse_struct_vec(idents: StructIdents) -> FieldTokensLerpable {
-        let name = idents.name();
-
-        let method_def = idents.to_method_override();
-
-        let for_lerpable = {
-            quote! {
-                #name: {
-                    #method_def
-                    lerpable::combine_vecs(&self.#name, &other.#name, method)
-                }
-            }
-        };
-
-        FieldTokensLerpable { for_lerpable }
-    }
-
-    // Thing(Vec<Something>);
-    fn from_newtype_recurse_struct_vec(idents: StructIdents) -> Self {
-        let method_def = idents.to_method_override();
-        let for_lerpable = quote! {
-            #method_def
-            lerpable::combine_vecs(&self.0, &other.0, method)
-        };
-
-        FieldTokensLerpable { for_lerpable }
-    }
 }

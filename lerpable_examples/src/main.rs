@@ -4,6 +4,7 @@ use lerpable::{IsLerpingMethod, Lerpable};
 
 #[derive(Debug, Clone, Lerpable)]
 pub struct BasicTypes {
+    #[lerpable(method = "skip")]
     s: String,
     a_number: f32,
     b_number: usize,
@@ -43,6 +44,7 @@ pub struct BasicTypesWithOverrides {
     #[lerpable(method = "custom_func")]
     a_number: f32,
     something: Vec<f32>,
+    #[lerpable(method = "skip")]
     label: String,
     #[lerpable(method = "skip")]
     b: HashMap<String, String>,
