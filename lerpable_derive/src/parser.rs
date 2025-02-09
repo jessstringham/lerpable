@@ -142,7 +142,8 @@ where
 #[darling(attributes(lerpable))]
 pub(crate) struct LivecodeFieldReceiver {
     pub(crate) ident: Option<syn::Ident>,
-    pub(crate) method: Option<String>, // from this point on, start using String instead of the function we started with
+    pub(crate) method: Option<String>, // from this point on, start using this method instead of the function we started with
+    pub(crate) func: Option<String>, // if you need to use types from other packages, you could use a func to wrap simple types
 }
 impl LivecodeFieldReceiver {
     fn is_skip(&self) -> bool {
@@ -216,6 +217,16 @@ impl StructIdents {
                     let method = pct;
                 }
             }
+        }
+    }
+
+    pub(crate) fn func(&self) -> Option<syn::Path> {
+        if let Some(func_str) = &self.data.func {
+            let method: syn::Path = syn::parse_str(&func_str)
+                .expect(&format!("Custom func {} is invalid path!", func_str));
+            Some(method)
+        } else {
+            None
         }
     }
 }

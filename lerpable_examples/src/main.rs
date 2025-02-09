@@ -4,7 +4,6 @@ use lerpable::{IsLerpingMethod, Lerpable};
 
 #[derive(Debug, Clone, Lerpable)]
 pub struct BasicTypes {
-    #[lerpable(method = "skip")]
     s: String,
     a_number: f32,
     b_number: usize,
@@ -35,14 +34,19 @@ impl IsLerpingMethod for CustomMethod {
     }
 }
 
-fn custom_func() -> CustomMethod {
+fn custom_method() -> CustomMethod {
     CustomMethod { pct: 0.0 }
+}
+
+fn custom_func<T: IsLerpingMethod>(this: &f32, other: &f32, _pct: &T) -> f32 {
+    *this - *other
 }
 
 #[derive(Debug, Clone, Lerpable)]
 pub struct BasicTypesWithOverrides {
-    #[lerpable(method = "custom_func")]
+    #[lerpable(func = "custom_func")]
     a_number: f32,
+    #[lerpable(method = "custom_method")]
     something: Vec<f32>,
     #[lerpable(method = "skip")]
     label: String,

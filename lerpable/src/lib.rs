@@ -21,7 +21,7 @@ where
     (1.0 - pct) * start + pct * end
 }
 
-pub fn combine_vecs<T, LerpMethod>(this: &[T], other: &[T], pct: &LerpMethod) -> Vec<T>
+pub fn lerp_vecs<T, LerpMethod>(this: &[T], other: &[T], pct: &LerpMethod) -> Vec<T>
 where
     T: Clone + Lerpable,
     LerpMethod: IsLerpingMethod,
@@ -90,6 +90,26 @@ impl IsLerpingMethod for f64 {
     }
 }
 
+impl IsLerpingMethod for f32 {
+    fn has_lerp_stepped(&self) -> bool {
+        *self > 0.5
+    }
+
+    fn lerp_pct(&self) -> f64 {
+        *self as f64
+    }
+
+    fn partial_lerp_pct(&self, i: usize, total: usize) -> f64 {
+        // (self - i / total) * total
+        // or (self * total).fract()
+        *self as f64 * total as f64 - i as f64
+    }
+
+    fn with_lerp_pct(&self, pct: f64) -> Self {
+        pct as f32
+    }
+}
+
 pub trait Lerpable: Sized + Clone {
     fn lerpify<T: IsLerpingMethod>(&self, other: &Self, pct: &T) -> Self;
 
@@ -124,6 +144,18 @@ impl<T: Lerpable + Clone> Lerpable for Vec<T> {
         if self.len() == 0 || other.len() == 0 {
             return self.clone();
         }
-        combine_vecs(&self, &other, method)
+        lerp_vecs(&self, &other, method)
+    }
+}
+
+impl Lerpable for bool {
+    fn lerpify<LerpMethod: IsLerpingMethod>(&self, other: &Self, method: &LerpMethod) -> Self {
+        step(self, other, method)
+    }
+}
+
+impl Lerpable for String {
+    fn lerpify<LerpMethod: IsLerpingMethod>(&self, other: &Self, method: &LerpMethod) -> Self {
+        step(self, other, method)
     }
 }
