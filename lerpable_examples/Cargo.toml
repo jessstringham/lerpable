@@ -1,5 +1,5 @@
 [package]
-name = "lerpable"
+name = "lerpable_examples"
 version = "0.0.1"
 edition = "2021"
 authors = ["Jessica Stringham <jessica@thisxorthat.art>"]
@@ -8,4 +8,4 @@ description = "a derive macro for combining ADTs"
 license = "MIT"
 
 [dependencies]
-lerpable_derive =  { version = "0.0.1", path = "../lerpable_derive/"}
+lerpable = { version = "0.0.1", path = "../lerpable/" }

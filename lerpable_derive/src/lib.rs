@@ -1,19 +1,16 @@
-[package]
-name = "lerpable-derive"
-version = "0.0.1"
-edition = "2021"
-authors = ["Jessica Stringham <jessica@thisxorthat.art>"]
-repository = "https://github.com/jessstringham/lerpable.git"
-license = "MIT"
-description = "a derive macro for Lerpable"
+extern crate proc_macro;
 
-[lib]
-proc-macro = true
+use darling::FromDeriveInput;
+use derive_lerpable::FieldTokensLerpable;
+use parser::{GenFinal, LivecodeReceiver};
+use proc_macro::TokenStream;
 
-[dependencies]
-syn = "2.0.15"
-quote = "1.0.18"
-proc-macro2 = "1.0.37"
-darling = "0.20.3"
+mod derive_lerpable;
+mod parser;
 
-lerpable = { version = "0.0.1", path = "../lerpable"}
+#[proc_macro_derive(Lerpable, attributes(lerpable))]
+pub fn murrelet_livecode_derive_lerpable(input: TokenStream) -> TokenStream {
+    let ast = syn::parse_macro_input!(input as syn::DeriveInput);
+    let ast_receiver = LivecodeReceiver::from_derive_input(&ast).unwrap();
+    FieldTokensLerpable::from_ast(ast_receiver).into()
+}
