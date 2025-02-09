@@ -67,8 +67,8 @@ impl GenFinal for FieldTokensLerpable {
     fn from_newtype_struct(idents: StructIdents, _parent_ident: syn::Ident) -> FieldTokensLerpable {
         let method_def = idents.to_method_override();
 
-        let lerpify = if let Some(func) = idents.data.func {
-            quote! { #func(&self, &other, method) }
+        let lerpify = if let Some(func) = idents.func() {
+            quote! { #func(&self.0, &other.0, method) }
         } else {
             quote! { self.0.lerpify(&other.0, method) }
         };

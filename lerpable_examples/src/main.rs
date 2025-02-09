@@ -60,6 +60,12 @@ enum EnumTest {
     B(BasicTypesWithOverrides),
 }
 
+#[derive(Debug, Clone, Lerpable)]
+struct SimpleNewtype(f32);
+
+#[derive(Debug, Clone, Lerpable)]
+struct OverrideNewtype(#[lerpable(func = "custom_func")] f32);
+
 fn main() {
     let a = EnumTest::A;
     let b = EnumTest::B(BasicTypesWithOverrides {
