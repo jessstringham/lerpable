@@ -157,6 +157,24 @@ impl LivecodeFieldReceiver {
             HowToControlThis::LerpifyType
         }
     }
+
+    fn to_method_override(&self) -> TokenStream2 {
+        if self.is_skip() {
+            quote! {
+                let method = pct;
+            }
+        } else if let Some(method_str) = &self.method {
+            let method: syn::Path =
+                syn::parse_str(method_str).expect("Custom method is invalid path!");
+            quote! {
+                let method = &#method().with_lerp_pct(pct.lerp_pct());
+            }
+        } else {
+            quote! {
+                let method = pct;
+            }
+        }
+    }
 }
 
 // for enums
@@ -189,6 +207,11 @@ impl EnumIdents {
     pub(crate) fn enum_ident(&self) -> syn::Ident {
         self.enum_name.clone()
     }
+
+    pub(crate) fn how_to_control_internal(&self) -> HowToControlThis {
+        // there should be just one field!
+        self.data.fields.fields.first().unwrap().how_to_control_this()
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -201,29 +224,13 @@ impl StructIdents {
     }
 
     pub(crate) fn to_method_override(&self) -> TokenStream2 {
-        if self.data.is_skip() {
-            quote! {
-                let method = pct;
-            }
-        } else {
-            if let Some(method_str) = &self.data.method {
-                let method: syn::Path =
-                    syn::parse_str(method_str).expect("Custom method is invalid path!");
-                quote! {
-                    let method = &#method().with_lerp_pct(pct.lerp_pct());
-                }
-            } else {
-                quote! {
-                    let method = pct;
-                }
-            }
-        }
+        self.data.to_method_override()
     }
 
     pub(crate) fn func(&self) -> Option<syn::Path> {
         if let Some(func_str) = &self.data.func {
-            let method: syn::Path = syn::parse_str(&func_str)
-                .expect(&format!("Custom func {} is invalid path!", func_str));
+            let method: syn::Path = syn::parse_str(func_str)
+                .unwrap_or_else(|_| panic!("Custom func {} is invalid path!", func_str));
             Some(method)
         } else {
             None

@@ -54,10 +54,14 @@ pub struct BasicTypesWithOverrides {
     b: HashMap<String, String>,
 }
 
+#[derive(Debug, Clone)]
+struct UnLerpableType();
+
 #[derive(Debug, Clone, Lerpable)]
 enum EnumTest {
     A,
     B(BasicTypesWithOverrides),
+    C(#[lerpable(method = "skip")] UnLerpableType),
 }
 
 #[derive(Debug, Clone)]

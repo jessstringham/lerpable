@@ -140,10 +140,10 @@ impl_lerpable!(f64);
 
 impl<T: Lerpable + Clone> Lerpable for Vec<T> {
     fn lerpify<LerpMethod: IsLerpingMethod>(&self, other: &Self, method: &LerpMethod) -> Self {
-        if self.len() == 0 || other.len() == 0 {
+        if self.is_empty() || other.is_empty() {
             return self.clone();
         }
-        lerp_vecs(&self, &other, method)
+        lerp_vecs(self, other, method)
     }
 }
 
