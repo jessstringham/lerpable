@@ -210,7 +210,12 @@ impl EnumIdents {
 
     pub(crate) fn how_to_control_internal(&self) -> HowToControlThis {
         // there should be just one field!
-        self.data.fields.fields.first().unwrap().how_to_control_this()
+        self.data
+            .fields
+            .fields
+            .first()
+            .unwrap()
+            .how_to_control_this()
     }
 }
 
