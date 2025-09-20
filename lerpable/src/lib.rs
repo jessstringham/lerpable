@@ -1,3 +1,8 @@
+#[cfg(feature = "glam")]
+use glam::{vec2, vec3, Vec2, Vec3};
+
+use core::option::Option;
+
 pub use lerpable_derive::Lerpable;
 
 pub fn step<T: Clone, LerpMethod>(this: &T, other: &T, pct: &LerpMethod) -> T
@@ -147,6 +152,29 @@ impl<T: Lerpable + Clone> Lerpable for Vec<T> {
     }
 }
 
+impl<T: Lerpable + Clone> Lerpable for Option<T> {
+    fn lerpify<LerpMethod: IsLerpingMethod>(&self, other: &Self, method: &LerpMethod) -> Self {
+        match (self, other) {
+            (Option::None, Option::Some(_)) => {
+                if method.lerp_pct() < 0.5 {
+                    None
+                } else {
+                    self.clone()
+                }
+            }
+            (Option::Some(_), Option::None) => {
+                if method.lerp_pct() < 0.5 {
+                    self.clone()
+                } else {
+                    None
+                }
+            }
+            (Option::Some(a), Option::Some(b)) => Some(a.lerpify(b, method)),
+            (Option::None, Option::None) => None,
+        }
+    }
+}
+
 impl Lerpable for bool {
     fn lerpify<LerpMethod: IsLerpingMethod>(&self, other: &Self, method: &LerpMethod) -> Self {
         step(self, other, method)
@@ -156,5 +184,28 @@ impl Lerpable for bool {
 impl Lerpable for String {
     fn lerpify<LerpMethod: IsLerpingMethod>(&self, other: &Self, method: &LerpMethod) -> Self {
         step(self, other, method)
+    }
+}
+
+#[cfg(feature = "glam")]
+impl Lerpable for Vec2 {
+    fn lerpify<LerpMethod: IsLerpingMethod>(&self, other: &Self, method: &LerpMethod) -> Self {
+        vec2(
+            self.x.lerpify(&other.x, method),
+            self.y.lerpify(&other.y, method),
+        )
+        .into()
+    }
+}
+
+#[cfg(feature = "glam")]
+impl Lerpable for Vec3 {
+    fn lerpify<T: IsLerpingMethod>(&self, other: &Self, method: &T) -> Self {
+        vec3(
+            self.x.lerpify(&other.x, method),
+            self.y.lerpify(&other.y, method),
+            self.z.lerpify(&other.z, method),
+        )
+        .into()
     }
 }
