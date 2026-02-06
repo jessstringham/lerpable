@@ -61,9 +61,11 @@ struct UnLerpableType();
 enum EnumTest {
     A,
     B(BasicTypesWithOverrides),
+    #[allow(dead_code)]
     C(#[lerpable(method = "skip")] UnLerpableType),
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 struct SimpleNewtype(f32);
 impl Lerpable for SimpleNewtype {
@@ -80,6 +82,7 @@ impl Lerpable for SimpleNewtype {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Clone, Lerpable)]
 struct OverrideNewtype(#[lerpable(func = "custom_func")] f32);
 

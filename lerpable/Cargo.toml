@@ -12,6 +12,6 @@ default = []
 glam = ["dep:glam"]
 
 [dependencies]
-lerpable_derive = { version = "0.0.2", path = "../lerpable_derive/" }
+lerpable_derive = { version = "0.0.3", path = "../lerpable_derive/" }
 
 glam = { version = "0.28.0", features = ["serde"], optional = true }

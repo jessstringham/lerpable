@@ -8,4 +8,4 @@ description = "a derive macro for combining ADTs"
 license = "MIT"
 
 [dependencies]
-lerpable = { version = "0.0.2", path = "../lerpable/" }
+lerpable = { version = "0.0.3", path = "../lerpable/" }
