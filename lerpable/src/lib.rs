@@ -137,6 +137,7 @@ macro_rules! impl_lerpable {
 impl_lerpable!(usize);
 impl_lerpable!(u8);
 impl_lerpable!(u16);
+impl_lerpable!(u32);
 impl_lerpable!(u64);
 impl_lerpable!(i32);
 impl_lerpable!(i64);
